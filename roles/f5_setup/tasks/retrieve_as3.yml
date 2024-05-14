@@ -4,7 +4,7 @@
   connection: local
   block:
     - name: URL provided
-      debug:
+      ansible.builtin.debug:
         var: as3_uri
 
     - name: Get releases for AS3
@@ -20,16 +20,19 @@
         as3_release_tag: "{{ __latest_rpm_release.name }}"
         as3_release_rpm_url: "{{ __latest_rpm_asset.browser_download_url }}"
       vars:
-        __latest_rpm_release: >-
-          {{ r_get_f5_appsvcs_extension_releases.json | json_query('[?assets[?ends_with(name, `".noarch.rpm"`)]]|[0]') }}
-        __latest_rpm_asset: >-
-          {{ __latest_rpm_release | json_query('assets[?ends_with(name, `".noarch.rpm"`)]|[0]') }}
+        __latest_rpm_release: "{{ r_get_f5_appsvcs_extension_releases.json | json_query('[?assets[?ends_with(name, `\".noarch.rpm\"`)]]|[0]') }}"
+        __latest_rpm_asset: "{{ __latest_rpm_release | json_query('assets[?ends_with(name, `\".noarch.rpm\"`)]|[0]') }}"
 
-    - debug: var=as3_release
-    - debug: var=as3_release_tag
-    - debug: var=as3_release_rpm_url
+    - ansible.builtin.debug:
+        var: as3_release
+
+    - ansible.builtin.debug:
+        var: as3_release_tag
+
+    - ansible.builtin.debug:
+        var: as3_release_rpm_url
 
     - name: Grab AS3 RPM from github
       ansible.builtin.get_url:
         url: "{{ as3_release_rpm_url }}"
-        dest: "~/"
+        dest: ~/
